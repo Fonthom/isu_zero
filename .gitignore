@@ -1,0 +1,11 @@
+.env
+*.env
+backend/isu-zero
+backend/vendor/
+__pycache__/
+*.pyc
+.ros/
+log/
+install/
+build/
+*.bag
