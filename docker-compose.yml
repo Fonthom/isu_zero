@@ -7,7 +7,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./infra/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./infra/init.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ./infra/seed_dev.sql:/docker-entrypoint-initdb.d/02_seed_dev.sql
     ports:
       - "5432:5432"
     healthcheck:
@@ -21,7 +22,7 @@ services:
     ports:
       - "4222:4222"
       - "8222:8222"
-    command: ["--http_port", "8222","--jetstream"]
+    command: ["--http_port", "8222"]
 
   backend:
     build: ./backend

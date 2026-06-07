@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -32,10 +33,14 @@ func NewService(db *pgxpool.Pool, bus *pubsub.Bus) *Service {
 }
 
 func (s *Service) Log(ctx context.Context, productID, queryText, outcome string, duration int) error {
+	var pid *string
+	if productID != "" {
+		pid = &productID
+	}
 	_, err := s.db.Exec(ctx, `
 		INSERT INTO interactions (product_id, query_text, outcome, duration_seconds)
 		VALUES ($1, $2, $3, $4)
-	`, productID, queryText, outcome, duration)
+	`, pid, queryText, outcome, duration)
 	return err
 }
 
@@ -55,9 +60,11 @@ func (s *Service) Recent(ctx context.Context, limit int) ([]Interaction, error) 
 	var results []Interaction
 	for rows.Next() {
 		var i Interaction
-		if err := rows.Scan(&i.ID, &i.ProductID, &i.QueryText, &i.Outcome, &i.DurationSeconds, &i.CreatedAt); err != nil {
+		var createdAt time.Time
+		if err := rows.Scan(&i.ID, &i.ProductID, &i.QueryText, &i.Outcome, &i.DurationSeconds, &createdAt); err != nil {
 			return nil, err
 		}
+		i.CreatedAt = createdAt.Format(time.RFC3339)
 		results = append(results, i)
 	}
 	return results, nil
@@ -106,5 +113,6 @@ func (h *Handler) recent(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to fetch interactions", http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(interactions)
 }

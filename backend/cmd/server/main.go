@@ -28,6 +28,10 @@ func main() {
 	}
 	defer db.Close()
 
+	if err := db.Ping(ctx); err != nil {
+		log.Fatalf("database unreachable: %v", err)
+	}
+
 	// NATS
 	nc, err := nats.Connect(os.Getenv("NATS_URL"))
 	if err != nil {
@@ -35,14 +39,21 @@ func main() {
 	}
 	defer nc.Close()
 
+	// Pub/sub bus — now returns an error
+	bus, err := pubsub.New(nc)
+	if err != nil {
+		log.Fatalf("unable to initialise pub/sub bus: %v", err)
+	}
+
 	// Services
-	bus := pubsub.New(nc)
 	productSvc := products.NewService(db)
 	navSvc := navigation.NewService(bus)
 	interactionSvc := interactions.NewService(db, bus)
 
-	// Start NATS subscribers in background
-	interactionSvc.StartSubscribers(ctx)
+	// Start NATS subscribers — now returns an error
+	if err := interactionSvc.StartSubscribers(ctx); err != nil {
+		log.Fatalf("unable to start interaction subscribers: %v", err)
+	}
 
 	// Router
 	r := chi.NewRouter()
@@ -56,6 +67,7 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
+
 	fmt.Printf("ISU-Zero backend running on :%s\n", port)
 	log.Fatal(http.ListenAndServe(":"+port, r))
 }

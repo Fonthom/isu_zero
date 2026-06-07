@@ -1,8 +1,8 @@
 .env
 *.env
 backend/isu-zero
-backend/vendor/
 __pycache__/
+/backend/vendor/
 *.pyc
 .ros/
 log/
