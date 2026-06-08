@@ -2,10 +2,15 @@
 *.env
 backend/isu-zero
 __pycache__/
-/backend/vendor/
+backend/vendor
 *.pyc
 .ros/
 log/
 install/
 build/
 *.bag
+cropper/assets/
+.pytest_cache/
+.venv/
+wheels/
+yolov8n.pt
