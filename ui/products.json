@@ -1,0 +1,28 @@
+[
+  {
+    "id": "prod-1",
+    "name": "Blue Widget",
+    "photo_id": "",
+    "waypoint_id": "wp-101",
+    "crop_path": "",
+    "crop_x": 0,
+    "crop_y": 0,
+    "crop_width": 0,
+    "crop_height": 0,
+    "nav_x": 1.234,
+    "nav_y": 5.678
+  },
+  {
+    "id": "prod-2",
+    "name": "Red Gizmo",
+    "photo_id": "",
+    "waypoint_id": "wp-102",
+    "crop_path": "",
+    "crop_x": 0,
+    "crop_y": 0,
+    "crop_width": 0,
+    "crop_height": 0,
+    "nav_x": -2.5,
+    "nav_y": 3.141
+  }
+]

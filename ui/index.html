@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Product Search — ISU-Zero</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Find a Product</h1>
+    <div class="search-row">
+      <input id="q" placeholder="Search products..." autofocus />
+      <button id="searchBtn">Search</button>
+    </div>
+    <div id="status" class="status">Type a query and press Search</div>
+    <ul id="results" class="results"></ul>
+    <div id="detail" class="detail hidden">
+      <h2 id="detail-name"></h2>
+      <p><strong>Coordinates:</strong> <span id="detail-coords"></span></p>
+      <p><strong>Waypoint:</strong> <span id="detail-waypoint"></span></p>
+      <div class="actions">
+        <button id="requestBtn">Request Robot (disabled)</button>
+        <button id="backBtn">Back to results</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
