@@ -8,7 +8,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --no-index --find-links=wheels/ -r requirements.txt
 
 # Copy pre-downloaded model weights — no internet access needed at build time
-COPY yolov8n.pt .
+COPY yolov8s.pt .
 
 COPY . .
 

@@ -7,16 +7,17 @@ from ultralytics import YOLO
 
 logger = logging.getLogger(__name__)
 
-# YOLOv8 nano — fast and small, sufficient for shelf detection
-MODEL_PATH = "yolov8n.pt"
+# YOLOv8 small — better detection than nano for cluttered shelf scenes
+MODEL_PATH = "cropper/best.pt"
 
 # Minimum confidence score to accept a detection.
 # Lower values catch more objects but increase false positives.
-CONFIDENCE_THRESHOLD = 0.25
+# 0.15 is more permissive — needed for grocery packaging not in COCO classes.
+CONFIDENCE_THRESHOLD = 0.125
 
 # Minimum pixel area for a detected region to be considered a product.
-# Filters out tiny detections that are likely noise.
-MIN_AREA = 1000
+# Lowered to 500 to catch smaller items like cans in dense shelf arrangements.
+MIN_AREA = 500
 
 
 @dataclass
@@ -30,11 +31,22 @@ class Detection:
 
 
 def load_model() -> YOLO:
+    """
+    Load the YOLOv8 model. Called once at startup.
+    The weights are baked into the image at build time.
+    """
     logger.info(f"loading YOLO model from {MODEL_PATH}")
     return YOLO(MODEL_PATH)
 
 
 def detect_products(model: YOLO, image_path: str) -> list[Detection]:
+    """
+    Run YOLO inference on a shelf photo and return a list of detections.
+    Each detection represents one product instance found in the image.
+    Duplicate instances of the same product (e.g. six cans in a row)
+    are all returned here — deduplication happens in the cropper pipeline
+    using perceptual hashing.
+    """
     path = Path(image_path)
     if not path.exists():
         logger.error(f"image not found: {image_path}")
@@ -79,6 +91,9 @@ def detect_products(model: YOLO, image_path: str) -> list[Detection]:
 
 
 def load_image(image_path: str) -> Image.Image:
+    """
+    Load an image from disk as a PIL Image.
+    """
     try:
         return Image.open(image_path).convert("RGB")
     except Exception as e:

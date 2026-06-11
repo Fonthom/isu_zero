@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nats-io/nats.go"
 
@@ -39,7 +40,7 @@ func main() {
 	}
 	defer nc.Close()
 
-	// Pub/sub bus — now returns an error
+	// Pub/sub bus
 	bus, err := pubsub.New(nc)
 	if err != nil {
 		log.Fatalf("unable to initialise pub/sub bus: %v", err)
@@ -50,7 +51,7 @@ func main() {
 	navSvc := navigation.NewService(bus)
 	interactionSvc := interactions.NewService(db, bus)
 
-	// Start NATS subscribers — now returns an error
+	// Start NATS subscribers
 	if err := interactionSvc.StartSubscribers(ctx); err != nil {
 		log.Fatalf("unable to start interaction subscribers: %v", err)
 	}
@@ -59,9 +60,25 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "OPTIONS"},
+		AllowedHeaders: []string{"Content-Type"},
+	}))
 
+	// API routes
 	r.Mount("/api/products", products.NewHandler(productSvc, navSvc))
 	r.Mount("/api/interactions", interactions.NewHandler(interactionSvc))
+
+	// Serve crop images from the shared photo volume
+	r.Handle("/photos/*", http.StripPrefix("/photos/", http.FileServer(http.Dir("/photos"))))
+
+	// Serve the UI — must be last so it doesn't swallow API routes
+	uiDir := os.Getenv("UI_DIR")
+	if uiDir == "" {
+		uiDir = "./ui"
+	}
+	r.Handle("/*", http.FileServer(http.Dir(uiDir)))
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -69,5 +86,6 @@ func main() {
 	}
 
 	fmt.Printf("ISU-Zero backend running on :%s\n", port)
+	fmt.Printf("UI served from: %s\n", uiDir)
 	log.Fatal(http.ListenAndServe(":"+port, r))
 }

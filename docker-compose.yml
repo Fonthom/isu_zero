@@ -30,8 +30,10 @@ services:
       DATABASE_URL: postgres://isu:${POSTGRES_PASSWORD}@postgres:5432/isu_zero?sslmode=disable
       NATS_URL: nats://nats:4222
       PORT: 8080
+      UI_DIR: /ui
     volumes:
       - photo_store:/photos
+      - ./ui:/ui:ro
     ports:
       - "8080:8080"
     depends_on:

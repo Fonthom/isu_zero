@@ -2,30 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Product Search — ISU-Zero</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ISU-Zero — Item Search Unit</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="container">
-    <h1>Find a Product</h1>
+  <div class="container">
+
+    <header class="site-header">
+      <div class="logo">ISU<span>-0</span></div>
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        SYSTEM ONLINE
+      </div>
+    </header>
+
     <div class="search-row">
-      <input id="q" placeholder="Search products..." autofocus />
-      <button id="searchBtn">Search</button>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input id="q" placeholder="What are you looking for?" autofocus autocomplete="off" />
+      </div>
+      <button id="searchBtn">SEARCH →</button>
     </div>
+
     <div id="status" class="status">Type a query and press Search</div>
+
     <ul id="results" class="results"></ul>
+
     <div id="detail" class="detail hidden">
       <h2 id="detail-name"></h2>
-      <p><strong>Coordinates:</strong> <span id="detail-coords"></span></p>
-      <p><strong>Waypoint:</strong> <span id="detail-waypoint"></span></p>
+      <p><strong>Coordinates</strong> <span id="detail-coords"></span></p>
+      <p><strong>Waypoint</strong> <span id="detail-waypoint"></span></p>
       <div class="actions">
-        <button id="requestBtn">Request Robot (disabled)</button>
-        <button id="backBtn">Back to results</button>
+        <button id="requestBtn">REQUEST ROBOT →</button>
+        <button id="backBtn">← BACK</button>
       </div>
     </div>
-  </main>
 
+  </div>
   <script src="app.js"></script>
 </body>
 </html>
